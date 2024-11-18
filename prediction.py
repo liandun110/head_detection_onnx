@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import fire
 import streamlit as st
 import cvzone
-import fire
 
 
 # Global Variables
@@ -112,7 +111,6 @@ def annotate(image, boxes, scores, class_ids):
                 thickness=1,scale=0.4, font=cv2.FONT_HERSHEY_DUPLEX , 
                 offset = 5,colorR=(0, 0, 0))
         
-    # Image.fromarray(cv2.cvtColor(image_draw, cv2.COLOR_BGR2RGB))
     rgb_image_draw = cv2.cvtColor(image_draw, cv2.COLOR_BGR2RGB)
     return rgb_image_draw
 
@@ -191,6 +189,5 @@ def predict_from_teminal(image_path = "img.jpg"):
     plt.show()
 
 
-
 if __name__=='__main__':
-    fire.Fire(predict_from_teminal)
+    predict_from_teminal()
