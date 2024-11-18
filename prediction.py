@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import fire
 import streamlit as st
 import cvzone
+import fire
+
 
 # Global Variables
 confidence = 80
@@ -14,6 +16,7 @@ conf_thresold = 0.8
 iou_thresold = 0.3
 Display_Confidence = True
 Display_Class = True
+
 
 # load image
 def load_image(image_path, input_shape):
@@ -180,6 +183,14 @@ def prediction(image_path, conf=80, disp_Class=True, disp_Confidence=True,
     return annotated_image
 
 
+def predict_from_teminal(image_path = "img.jpg"):
+    annotatedImage = prediction(image_path)
+    plt.imshow(annotatedImage)
+    plt.grid(False)
+    plt.axis('off')
+    plt.show()
+
+
 
 if __name__=='__main__':
-    fire.Fire(prediction)
+    fire.Fire(predict_from_teminal)
