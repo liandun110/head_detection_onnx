@@ -38,7 +38,7 @@ def load_model(model_path):
     opt_session.enable_cpu_mem_arena = False
     opt_session.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL  
     model_path = model_path
-    EP_list = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+    EP_list = ['CPUExecutionProvider']
     ort_session = onnxruntime.InferenceSession(model_path, providers=EP_list)
     model_inputs = ort_session.get_inputs()
     input_names = [model_inputs[i].name for i in range(len(model_inputs))]
@@ -159,7 +159,7 @@ def xywh2xyxy(x):
     return y
     
 def prediction(image_path, conf=80, disp_Class=True, disp_Confidence=True,
-               iou_thresh_ = 30, model_path="models/best_re_final.onnx"):
+               iou_thresh_ = 30, model_path="model.onnx"):
     global confidence
     global conf_thresold
     global iou_thresold

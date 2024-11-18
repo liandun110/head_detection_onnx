@@ -1,8 +1,17 @@
+# 运行方式
+```bash
+conda create -n head_detection_onnx python=3.10.12
+conda activate head_detection_onnx
+pip install -r requirements.txt
+python main.py
+```
+
 # 代码
-- https://github.com/Varat7v2/Human-Head-Detection
-  - 没有训练代码。
 - https://github.com/AbelKidaneHaile/Reports
   - 基于YOLOv8，应该可以训练。
+  - 本项目基于此代码。
+- https://github.com/Varat7v2/Human-Head-Detection
+  - 没有训练代码。
 - https://github.com/aditya-vora/FCHD-Fully-Convolutional-Head-Detector
   - 训练代码和测试代码都比较完善。
   - 代码还提供了演示视频，确认可以检测后脑勺。
