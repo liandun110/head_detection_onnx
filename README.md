@@ -3,7 +3,7 @@
 conda create -n head_detection_onnx python=3.10.12
 conda activate head_detection_onnx
 pip install -r requirements.txt
-python prediction.py
+python main.py
 ```
 
 # 代码

@@ -2,13 +2,14 @@
 import onnxruntime
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-import cvzone
 
 # Global Variables
 confidence = 80
 conf_thresold = 0.8
 iou_thresold = 0.3
+Display_Confidence = True
+Display_Class = True
+
 Display_Confidence = True
 Display_Class = True
 
@@ -39,7 +40,6 @@ def load_model(model_path):
     EP_list = ['CPUExecutionProvider']
     ort_session = onnxruntime.InferenceSession(model_path, providers=EP_list)
     model_inputs = ort_session.get_inputs()
-    input_names = [model_inputs[i].name for i in range(len(model_inputs))]
     input_shape = model_inputs[0].shape
 
     return [ort_session, input_shape]
@@ -58,8 +58,7 @@ def predict(image, ort_session, input_tensor):
     output_names = [model_output[i].name for i in range(len(model_output))]
     outputs = ort_session.run(output_names, {input_names[0]: input_tensor})[0]
     predictions = np.squeeze(outputs).T
-    # conf_thresold = 0.8
-    # conf_thresold = confidence/100
+
     # Filter out object confidence scores below threshold
     scores = np.max(predictions[:, 4:], axis=1)
     predictions = predictions[scores > conf_thresold, :]
@@ -77,7 +76,6 @@ def predict(image, ort_session, input_tensor):
     return [boxes, scores, class_ids]
 
 
-# annotate the image by drawing the bounding boxes
 def annotate(image, boxes, scores, class_ids):
     # Apply non-maxima suppression to suppress weak, overlapping bounding boxes
     global iou_thresold
@@ -85,27 +83,27 @@ def annotate(image, boxes, scores, class_ids):
     global Display_Class
 
     indices = nms(boxes, scores, iou_thresold)
-    # Define classes 
+    # Define classes
     CLASSES = ['head']
     image_draw = image.copy()
     for (bbox, score, label) in zip(xywh2xyxy(boxes[indices]), scores[indices], class_ids[indices]):
         bbox = bbox.round().astype(np.int32).tolist()
         cls_id = int(label)
         cls = CLASSES[cls_id]
-        # color = (0,255,0)
-
         x1, y1, w, h = bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]
         display_message = ""
-        if (Display_Class):
+        if Display_Class:
             display_message = display_message + cls
-        if (Display_Confidence):
+        if Display_Confidence:
             display_message = f"{display_message} {score:.2f}"
-        cv2.rectangle(image_draw, (x1, y1, w, h), (0, 255, 0), 1)
-        if (Display_Confidence or Display_Class):
-            cvzone.putTextRect(image_draw,
-                               display_message, (max(0, x1), max(35, y1)),
-                               thickness=1, scale=0.4, font=cv2.FONT_HERSHEY_DUPLEX,
-                               offset=5, colorR=(0, 0, 0))
+        cv2.rectangle(image_draw, (x1, y1), (x1 + w, y1 + h), (0, 255, 0), 1)
+        if Display_Confidence or Display_Class:
+            # Calculate text width and height
+            (text_width, text_height), _ = cv2.getTextSize(display_message, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
+            # Put text background
+            cv2.rectangle(image_draw, (x1, y1), (x1 + text_width, y1 - text_height - 10), (0, 255, 0), -1)
+            # Put text
+            cv2.putText(image_draw, display_message, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1)
 
     rgb_image_draw = cv2.cvtColor(image_draw, cv2.COLOR_BGR2RGB)
     return rgb_image_draw
@@ -182,13 +180,13 @@ def prediction(image_path, conf=80, disp_Class=True, disp_Confidence=True,
     return annotated_image
 
 
-def predict_from_teminal(image_path="img.jpg"):
+def predict_from_terminal(image_path="img.jpg"):
     annotatedImage = prediction(image_path)
-    plt.imshow(annotatedImage)
-    plt.grid(False)
-    plt.axis('off')
-    plt.show()
+    annotatedImage = cv2.cvtColor(annotatedImage, cv2.COLOR_RGB2BGR)
+    cv2.imshow('Annotated Image', annotatedImage)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    predict_from_teminal()
+    predict_from_terminal()
